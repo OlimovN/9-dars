@@ -1,7 +1,6 @@
 // src/pages/Home.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { FaBookmark } from "react-icons/fa";
 
 const Home = () => {
@@ -10,7 +9,6 @@ const Home = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [bookmarkedMovies, setBookmarkedMovies] = useState([]);
   const moviesPerPage = 12;
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -23,6 +21,7 @@ const Home = () => {
             },
           }
         );
+        console.log("Fetched movies:", response.data.docs);
         setMovies(response.data.docs);
         setTotalPages(Math.ceil(response.data.total / moviesPerPage));
       } catch (error) {
@@ -70,37 +69,43 @@ const Home = () => {
           Recommended for you
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {movies.map((movie) => (
-            <div
-              key={movie.id}
-              className="relative rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 bg-gray-700"
-            >
-              <img
-                src={movie.poster?.url}
-                alt={movie.name}
-                className="w-full h-48 object-cover transition-transform hover:scale-105"
-              />
-              <div className="absolute top-2 right-2">
-                <FaBookmark
-                  size={24}
-                  className={`cursor-pointer ${
-                    isBookmarked(movie.id)
-                      ? "text-red-500"
-                      : "text-white opacity-50"
-                  }`}
-                  onClick={() => handleBookmark(movie)}
+          {movies.length === 0 ? (
+            <p className="text-white text-center">
+              No movies found or an error occurred.
+            </p>
+          ) : (
+            movies.map((movie) => (
+              <div
+                key={movie.id}
+                className="relative rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 bg-gray-700"
+              >
+                <img
+                  src={movie.poster?.url}
+                  alt={movie.name}
+                  className="w-full h-48 object-cover transition-transform hover:scale-105"
                 />
+                <div className="absolute top-2 right-2">
+                  <FaBookmark
+                    size={24}
+                    className={`cursor-pointer ${
+                      isBookmarked(movie.id)
+                        ? "text-red-500"
+                        : "text-white opacity-50"
+                    }`}
+                    onClick={() => handleBookmark(movie)}
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-white">
+                    {movie.name}
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    {movie.year} - {movie.type}
+                  </p>
+                </div>
               </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-white">
-                  {movie.name}
-                </h3>
-                <p className="text-sm text-gray-400">
-                  {movie.year} - {movie.type}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
         <div className="mt-8 flex justify-center gap-4">
           <button
